@@ -91,6 +91,8 @@ idf.py -p /dev/cu.usbmodem* flash
 
 ### 二、启动 Bridge（电脑端，每次开机需启动）
 
+**前置要求：** Node.js v18–v22
+
 ```bash
 # 安装依赖（首次）
 cd bridge
@@ -224,16 +226,19 @@ source ~/esp/esp-idf/export.sh
 python3 ~/esp/esp-idf/tools/idf.py build
 ```
 
-### Bridge 启动后立即退出（exit code 134）
+### Bridge 启动后立即退出（exit code 134 / abort）
 
-noble 的原生蓝牙模块可能与当前 Node.js 版本不兼容：
+macOS 上 `@abandonware/noble` 使用 CoreBluetooth 原生绑定。如果进程无法访问蓝牙子系统，会静默 `abort()`。最常见的原因是**在 tmux / screen 中运行** — 终端复用器创建的 session 脱离了 macOS GUI 登录会话，蓝牙 TCC（隐私）权限无法继承。
+
+**解决：** 在原生 Terminal.app / iTerm2 窗口中运行（不要在 tmux 或 screen 里）：
 
 ```bash
-# 重装原生依赖
 cd bridge
-rm -rf node_modules
-npm install
-
-# 如果仍然失败，检查 Node.js 版本，推荐 v18 或 v20
-node --version
+node src/index.js
 ```
+
+> **提示：** 如果日常需要 tmux，单独留一个终端标签页跑 bridge 即可。
+
+其他可能原因：
+- 首次运行 — macOS 会弹窗请求蓝牙权限，务必点击**允许**
+- 在沙箱化的 IDE 终端中运行（部分 VS Code 配置）— 换用独立终端窗口

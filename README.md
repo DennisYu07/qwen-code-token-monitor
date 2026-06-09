@@ -85,6 +85,8 @@ idf.py -p /dev/cu.usbmodem* flash
 
 ### Step 2: Start Bridge (Host Computer, on every boot)
 
+**Prerequisites:** Node.js v18–v22
+
 ```bash
 # Install dependencies (first time only)
 cd bridge
@@ -217,15 +219,19 @@ source ~/esp/esp-idf/export.sh
 python3 ~/esp/esp-idf/tools/idf.py build
 ```
 
-### Bridge exits immediately (exit code 134)
+### Bridge exits immediately (exit code 134 / abort)
 
-The native Bluetooth module in noble may be incompatible with your Node.js version:
+On macOS, `@abandonware/noble` uses CoreBluetooth native bindings. The process will silently `abort()` if it cannot access the Bluetooth subsystem. The most common cause is **running inside tmux / screen** — these multiplexers create sessions detached from the macOS GUI login session, so the Bluetooth TCC (privacy) permission is not inherited.
+
+**Fix:** Run the bridge in a regular Terminal.app / iTerm2 window (not inside tmux or screen):
 
 ```bash
 cd bridge
-rm -rf node_modules
-npm install
-
-# If still failing, check Node.js version — v18 or v20 recommended
-node --version
+node src/index.js
 ```
+
+> **Tip:** If you need tmux for other work, just keep one standalone terminal tab for the bridge.
+
+Other possible causes:
+- First run — macOS will prompt for Bluetooth permission; make sure to click **Allow**
+- Running in a sandboxed IDE terminal (some VS Code configurations) — try a standalone terminal instead
