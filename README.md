@@ -1,108 +1,108 @@
 # Token Monitor BLE
 
-Qwen Code token 用量实时仪表盘。ESP32-S3 墨水屏通过 BLE 接收电脑端
-Bridge 推送的数据，显示今日 token 消耗、模型分布、活跃时长等指标。
+English | [中文](README.zh-CN.md)
+
+> **Vibe Coding Project** — This project was built entirely through AI-driven conversational development (vibe coding). The original prompt:
+>
+> *"Referencing https://github.com/CEJXXX/token-monitor-RLCD, build a Qwen Code token monitor on the Waveshare ESP32-S3-RLCD-4.2 with a developer-friendly display. What do you suggest? Give me a plan first, we'll discuss before implementing."*
+
+A real-time token usage dashboard for [Qwen Code](https://github.com/QwenLM/qwen-code). An ESP32-S3 reflective LCD receives data from a Node.js BLE bridge and displays daily token consumption, model breakdown, active time, and more.
 
 ```
 Qwen Code sessions → .jsonl files → Bridge (Node.js)
-    → BLE write → ESP32 GATT → LVGL UI → 400×300 墨水屏
+    → BLE write → ESP32 GATT → LVGL UI → 400×300 reflective LCD
 ```
 
-## 硬件
+## Hardware
 
 - [Waveshare ESP32-S3-RLCD-4.2](https://www.waveshare.net/wiki/ESP32-S3-RLCD-4.2)
-  - 400×300 反射式 LCD（墨水屏风格）
-  - 板载 SHTC3 温湿度传感器
-  - USB-C 供电 & 烧录
+  - 400×300 reflective LCD (e-ink style, always-on, no backlight)
+  - Onboard SHTC3 temperature/humidity sensor
+  - USB-C for power & flashing
 
-## 项目结构
+## Project Structure
 
 ```
 token-monitor-ble/
-├── firmware/          # ESP-IDF v5.x 固件
-│   ├── main/          # 入口 + 配置
-│   └── components/    # BLE、UI、传感器等模块
-└── bridge/            # Node.js BLE 桥接进程
-    └── src/index.js   # 读取会话文件 → BLE 推送
+├── firmware/          # ESP-IDF v5.x firmware
+│   ├── main/          # Entry point + config
+│   └── components/    # BLE, UI, sensor modules
+└── bridge/            # Node.js BLE bridge
+    └── src/index.js   # Reads session files → BLE push
 ```
 
-## 快速配置（新设备）
+## Quick Start (New Device)
 
-### 一、烧录固件（ESP32 端，只需一次）
+### Step 1: Flash Firmware (ESP32, one-time)
 
-**前置条件：** 已安装 [ESP-IDF v5.x](https://dl.espressif.com/dl/esp-idf/)
+**Prerequisites:** [ESP-IDF v5.x](https://dl.espressif.com/dl/esp-idf/) installed
 
 ```bash
-# 进入固件目录
 cd firmware
 
-# 创建 secrets.h（BLE 模式不用填真实值，占位即可编译）
+# Create secrets.h (BLE mode doesn't need real values, placeholders are fine)
 cp main/secrets.h.example main/secrets.h
 
-# 加载 ESP-IDF 环境（路径按实际安装位置调整）
+# Load ESP-IDF environment (adjust path to your installation)
 source ~/esp/esp-idf/export.sh
 
-# 编译 & 烧录（先插上 USB-C）
+# Build & flash (plug in USB-C first)
 idf.py set-target esp32s3
 idf.py build
 idf.py -p /dev/cu.usbmodem* flash
 ```
 
-烧录完成后屏幕亮起，显示 `QWEN CODE` 仪表盘骨架。
+After flashing, the screen lights up showing the `QWEN CODE` dashboard skeleton.
 
-#### 自定义问候名
+#### Custom Greeting Name
 
-屏幕头部默认显示 "早上好～"，如需加上名字（如 "山果，早上好～"），需要两步：
+The header shows "早上好～" (Good morning) by default. To add a name (e.g. "山果，早上好～"):
 
-**1. 重新生成中文字体**（默认字体只含有限汉字，自定义名字需要补充）：
+**1. Regenerate the Chinese font** (the default font only contains limited CJK characters):
 
 ```bash
 npx lv_font_conv \
   --font /Library/Fonts/Alibaba-PuHuiTi-Medium.otf \
-  --symbols "你的名字，早上好～下午晚上" \
+  --symbols "YourName，早上好～下午晚上" \
   --size 18 --bpp 1 --format lvgl \
   --lv-font-name font_zh18 --lv-include lvgl.h --no-compress \
   -o firmware/components/ui_app/font_zh18.c
 ```
 
-> 将 `你的名字` 替换为实际名字，确保所有需要的汉字都在 `--symbols` 参数中。
-> 字体文件路径按系统实际情况调整（macOS 一般在 `/Library/Fonts/`）。
+> Replace `YourName` with the actual CJK characters. All required characters must be in `--symbols`.
 
-**2. 编译时传入名字：**
+**2. Pass the name at build time:**
 
 ```bash
-# 先通过 cmake 设置名字变量
 cmake -DRLCD_GREETING_NAME="山果" -S . -B build
-
-# 然后正常编译烧录
 idf.py build
 idf.py -p /dev/cu.usbmodem* flash
 ```
 
-> **注意：** `idf.py build -- -DRLCD_GREETING_NAME="xxx"` **不生效**，idf.py 不支持 `--` 传递 cmake 参数，必须先单独调用 `cmake`。
+> **Note:** `idf.py build -- -DRLCD_GREETING_NAME="xxx"` **does not work** — idf.py doesn't support `--` for passing cmake variables. You must call `cmake` separately first.
 
-> **Windows 用户：** 详见 [firmware/README.md](firmware/README.md) 中的 Windows quick start 章节。
+> **Windows users:** See the Windows quick start section in [firmware/README.md](firmware/README.md).
 
-### 二、启动 Bridge（电脑端，每次开机需启动）
+### Step 2: Start Bridge (Host Computer, on every boot)
 
 ```bash
-# 安装依赖（首次）
+# Install dependencies (first time only)
 cd bridge
 npm install
 
-# 启动
+# Start
 node src/index.js
 ```
 
-终端看到 `[ble] ready` 表示连接成功，屏幕开始显示实时数据。
+When you see `[ble] ready` in the terminal, the connection is established and data starts flowing to the screen.
 
-### 三、验证
+### Step 3: Verify
 
-1. 屏幕左侧显示今日 token 消耗数字、进度条、Top3 模型
-2. 屏幕右侧显示 Session 数、活跃时长、Input/Output Tokens 等
-3. 头部显示问候语、时间、室内温湿度
+1. Left side shows daily token count with progress bar and Top 3 models
+2. Right side shows session count, active time, input/output tokens, cache rate, and 7-day total
+3. Header shows greeting, time, and indoor temperature/humidity
 
-## 屏幕布局
+## Screen Layout
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
@@ -129,56 +129,55 @@ node src/index.js
 └──────────────────────────────────────┴───────────────────────────┘
 ```
 
-## 数据来源
+## Data Source
 
-Bridge 扫描 `~/.qwen/projects/*/chats/*.jsonl`（Qwen Code 的会话记录），
-从中提取 `usageMetadata` 汇总 token 用量，每秒通过 BLE 推送到 ESP32。
+The bridge scans `~/.qwen/projects/*/chats/*.jsonl` (Qwen Code session logs),
+extracts `usageMetadata` to aggregate token usage, and pushes it to the ESP32 via BLE every second.
 
-## BLE 协议
+## BLE Protocol
 
-设备名：`QwenToken`，GATT Service/Characteristic 使用自定义 128-bit UUID。
-Payload 为 `|` 分隔的文本（v3 格式）：
+Device name: `QwenToken`. Uses custom 128-bit UUIDs for GATT Service/Characteristic.
+Payload is `|`-delimited text (v3 format):
 
 ```
 3|todayTotal|sessions|cached|cacheRate|activeMin|updatedAt|model1|pct1|model2|pct2|model3|pct3|errors|ageSec|output|weekTotal|input
 ```
 
-## 环境变量（Bridge）
+## Environment Variables (Bridge)
 
-| 变量 | 默认值 | 说明 |
-|------|--------|------|
-| `QWEN_BLE_PUSH_MS` | 1000 | 推送间隔（毫秒） |
-| `QWEN_BLE_SCAN_DAYS` | 7 | 扫描最近 N 天的会话文件 |
-| `QWEN_BLE_TAIL_BYTES` | 2097152 | 每个文件读取尾部字节数 |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `QWEN_BLE_PUSH_MS` | 1000 | Push interval in milliseconds |
+| `QWEN_BLE_SCAN_DAYS` | 7 | Scan session files from the last N days |
+| `QWEN_BLE_TAIL_BYTES` | 2097152 | Tail bytes to read per session file |
 
-## 注意事项
+## Notes
 
-- macOS 首次运行 Bridge 会弹蓝牙权限请求，需允许终端访问蓝牙
-- Bridge 必须在**有蓝牙权限的终端**里运行（iTerm / Terminal.app），sandbox 环境无法使用 BLE
-- ESP32 与电脑蓝牙距离保持在 10m 以内
-- 首次编译会通过 IDF Component Manager 下载 LVGL（~50MB），需联网
+- macOS will prompt for Bluetooth permission on first Bridge run — allow it
+- Bridge must run in a **terminal with Bluetooth access** (iTerm / Terminal.app), not in sandboxed environments
+- Keep ESP32 within 10m of the host computer
+- First build downloads LVGL (~50MB) via IDF Component Manager — requires internet
 
 ## Troubleshooting
 
-### 屏幕亮了但没有数据
+### Screen is on but no data
 
-**检查 Bridge 是否在运行：**
+**Check if Bridge is running:**
 
 ```bash
-# 查看 bridge 日志
 tail -10 /tmp/qwen-token-ble-bridge.log
 
-# 如果看到 [ble] wrote ... 表示 bridge 正在推送数据
-# 如果看到 [ble] scanning for QwenToken 表示还没连上设备
+# [ble] wrote ... → bridge is pushing data
+# [ble] scanning for QwenToken → not yet connected
 ```
 
-**检查 BLE 设备是否可见：**
+**Check if the BLE device is visible:**
 
 ```bash
-# macOS 系统自带（无需安装）
+# macOS built-in (no install needed)
 system_profiler SPBluetoothDataType 2>/dev/null | grep -A5 "QwenToken"
 
-# 或用 Python bleak 扫描（能看到信号强度）
+# Or scan with Python bleak (shows signal strength)
 pip3 install bleak
 python3 -c "
 import asyncio
@@ -192,42 +191,41 @@ asyncio.run(scan())
 "
 ```
 
-> **注意：** BLE 设备不会出现在 macOS 系统偏好设置的蓝牙列表中（那里只显示经典蓝牙），必须用上述命令查看。
+> **Note:** BLE devices do NOT appear in macOS System Preferences → Bluetooth (that only shows classic Bluetooth). Use the commands above.
 
-### 多台设备时 Bridge 连错设备
+### Bridge connects to wrong device (multiple devices)
 
-所有设备的 BLE 名称都是 `QwenToken`，Bridge 会连接最先发现的那台。如果连错了：
+All devices advertise as `QwenToken`. Bridge connects to whichever it discovers first.
 
-1. 将不需要的设备断电（拔掉 USB-C）
-2. 在 Bridge 终端按 `Ctrl+C` 停止，然后重新启动 `node src/index.js`
-3. Bridge 会重新扫描并连接唯一在线的设备
+1. Power off the unwanted device (unplug USB-C)
+2. `Ctrl+C` the bridge, then restart `node src/index.js`
+3. Bridge will rescan and connect to the only online device
 
-### 如何关闭/断电设备
+### How to power off the device
 
-- **Waveshare ESP32-S3-RLCD-4.2 没有电源开关**，拔掉 USB-C 线即可断电
-- 如果设备配有电池，直接拆下电池即可，ESP32 断电不会损坏硬件或数据
-- 断电后 BLE 连接可能有几秒延迟才断开，Bridge 会自动检测并重新扫描
+- **The Waveshare ESP32-S3-RLCD-4.2 has no power switch** — just unplug USB-C
+- If the device has a battery, simply remove it. Cutting power to ESP32 will not damage hardware or data
+- BLE disconnect may take a few seconds after power-off; Bridge will auto-detect and rescan
 
-### idf.py 不在 PATH 中
+### idf.py not found
 
 ```bash
-# 加载 ESP-IDF 环境（每次新开终端都需要）
+# Load ESP-IDF environment (needed for each new terminal session)
 source ~/esp/esp-idf/export.sh
 
-# 如果 idf.py 仍然找不到，尝试直接用 python 调用
+# If idf.py is still not found, call it via Python directly
 python3 ~/esp/esp-idf/tools/idf.py build
 ```
 
-### Bridge 启动后立即退出（exit code 134）
+### Bridge exits immediately (exit code 134)
 
-noble 的原生蓝牙模块可能与当前 Node.js 版本不兼容：
+The native Bluetooth module in noble may be incompatible with your Node.js version:
 
 ```bash
-# 重装原生依赖
 cd bridge
 rm -rf node_modules
 npm install
 
-# 如果仍然失败，检查 Node.js 版本，推荐 v18 或 v20
+# If still failing, check Node.js version — v18 or v20 recommended
 node --version
 ```
