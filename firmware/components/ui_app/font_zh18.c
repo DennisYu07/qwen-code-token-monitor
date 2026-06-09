@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Size: 18 px
  * Bpp: 1
- * Opts: --font /Library/Fonts/Alibaba-PuHuiTi-Medium.otf --symbols 山果，早上好～下午晚上 --size 18 --bpp 1 --format lvgl --lv-font-name font_zh18 --lv-include lvgl.h --no-compress -o .qwen/token-monitor-ble/firmware/components/ui_app/font_zh18.c
+ * Opts: --font /Library/Fonts/Alibaba-PuHuiTi-Medium.otf --symbols 山果文渊，早上好～下午晚上 --size 18 --bpp 1 --format lvgl --lv-font-name font_zh18 --lv-include lvgl.h --no-compress -o /Users/pomelo/Desktop/workspace/qwen-code-token-monitor/firmware/components/ui_app/font_zh18.c
  ******************************************************************************/
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
@@ -54,6 +54,13 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0xc, 0x3c, 0x30, 0xf0, 0xc3, 0xc3, 0xf, 0xc,
     0x3f, 0xff, 0xff, 0xff, 0x0, 0xc,
 
+    /* U+6587 "文" */
+    0x0, 0x80, 0x0, 0xc0, 0x0, 0x70, 0xf, 0xff,
+    0xe7, 0xff, 0xf0, 0x60, 0xc0, 0x30, 0x60, 0x18,
+    0x30, 0x6, 0x30, 0x3, 0xb8, 0x0, 0xd8, 0x0,
+    0x38, 0x0, 0x3e, 0x0, 0x3b, 0xc0, 0xf8, 0xf9,
+    0xf0, 0x1f, 0x60, 0x3, 0x0,
+
     /* U+65E9 "早" */
     0x3f, 0xfc, 0x30, 0xc, 0x30, 0xc, 0x30, 0xc,
     0x3f, 0xfc, 0x30, 0xc, 0x30, 0xc, 0x3f, 0xfc,
@@ -74,6 +81,12 @@ static LV_ATTRIBUTE_LARGE_CONST const uint8_t glyph_bitmap[] = {
     0xd6, 0x1, 0xc9, 0xc3, 0xc4, 0x79, 0x82, 0xc,
     0x1, 0x0,
 
+    /* U+6E0A "渊" */
+    0x66, 0x63, 0x77, 0x6f, 0x3f, 0x6f, 0x17, 0xeb,
+    0x46, 0xfb, 0xe6, 0xfb, 0x76, 0x63, 0x7, 0xff,
+    0x6, 0x63, 0x36, 0xf3, 0x36, 0xfb, 0x27, 0xef,
+    0x67, 0x6f, 0x6d, 0x63, 0x6c, 0x63, 0x5c, 0x63,
+
     /* U+FF0C "，" */
     0x33, 0x66, 0x60,
 
@@ -93,11 +106,13 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
     {.bitmap_index = 62, .adv_w = 283, .box_w = 16, .box_h = 17, .ofs_x = 1, .ofs_y = -2},
     {.bitmap_index = 96, .adv_w = 283, .box_w = 17, .box_h = 17, .ofs_x = 0, .ofs_y = -2},
     {.bitmap_index = 133, .adv_w = 283, .box_w = 14, .box_h = 17, .ofs_x = 2, .ofs_y = -2},
-    {.bitmap_index = 163, .adv_w = 283, .box_w = 16, .box_h = 16, .ofs_x = 1, .ofs_y = -2},
-    {.bitmap_index = 195, .adv_w = 283, .box_w = 15, .box_h = 18, .ofs_x = 2, .ofs_y = -3},
-    {.bitmap_index = 229, .adv_w = 283, .box_w = 17, .box_h = 16, .ofs_x = 0, .ofs_y = -2},
-    {.bitmap_index = 263, .adv_w = 283, .box_w = 4, .box_h = 5, .ofs_x = 2, .ofs_y = -2},
-    {.bitmap_index = 266, .adv_w = 283, .box_w = 9, .box_h = 4, .ofs_x = 4, .ofs_y = 4}
+    {.bitmap_index = 163, .adv_w = 283, .box_w = 17, .box_h = 17, .ofs_x = 0, .ofs_y = -2},
+    {.bitmap_index = 200, .adv_w = 283, .box_w = 16, .box_h = 16, .ofs_x = 1, .ofs_y = -2},
+    {.bitmap_index = 232, .adv_w = 283, .box_w = 15, .box_h = 18, .ofs_x = 2, .ofs_y = -3},
+    {.bitmap_index = 266, .adv_w = 283, .box_w = 17, .box_h = 16, .ofs_x = 0, .ofs_y = -2},
+    {.bitmap_index = 300, .adv_w = 283, .box_w = 16, .box_h = 16, .ofs_x = 0, .ofs_y = -2},
+    {.bitmap_index = 332, .adv_w = 283, .box_w = 4, .box_h = 5, .ofs_x = 2, .ofs_y = -2},
+    {.bitmap_index = 335, .adv_w = 283, .box_w = 9, .box_h = 4, .ofs_x = 4, .ofs_y = 4}
 };
 
 /*---------------------
@@ -105,8 +120,8 @@ static const lv_font_fmt_txt_glyph_dsc_t glyph_dsc[] = {
  *--------------------*/
 
 static const uint16_t unicode_list_0[] = {
-    0x0, 0x1, 0x53e, 0xb73, 0xe67, 0x17df, 0x1850, 0x1992,
-    0xb102, 0xb154
+    0x0, 0x1, 0x53e, 0xb73, 0xe67, 0x177d, 0x17df, 0x1850,
+    0x1992, 0x2000, 0xb102, 0xb154
 };
 
 /*Collect the unicode lists and glyph_id offsets*/
@@ -114,7 +129,7 @@ static const lv_font_fmt_txt_cmap_t cmaps[] =
 {
     {
         .range_start = 19978, .range_length = 45397, .glyph_id_start = 1,
-        .unicode_list = unicode_list_0, .glyph_id_ofs_list = NULL, .list_length = 10, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
+        .unicode_list = unicode_list_0, .glyph_id_ofs_list = NULL, .list_length = 12, .type = LV_FONT_FMT_TXT_CMAP_SPARSE_TINY
     }
 };
 
