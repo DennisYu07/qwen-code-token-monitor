@@ -157,7 +157,7 @@ void ui_app_init(void)
     divider(s, 10, 34, 380, 2);
 
     /* ── left column (x 12..254) ── */
-    label(s, 12, 46, &lv_font_montserrat_36, "QWEN CODE");
+    label(s, 12, 46, &lv_font_montserrat_36, "Qwen");
 
     label(s, 12, 94, &lv_font_montserrat_14, "DAILY SMALL GOAL: 100M");
     lbl_today = label(s, 12, 112, &lv_font_montserrat_28, "--");
@@ -193,8 +193,6 @@ void ui_app_init(void)
     lbl_model_3_pct = aligned(s, 206, 230, 48, LV_TEXT_ALIGN_RIGHT,
                               &font_amt14, "--");
 
-    divider(s, 12, 256, 244, 1);
-    label(s, 12, 264, &lv_font_montserrat_12, "QwenLM/qwen-code");
 
     /* ── vertical divider ── */
     divider(s, 268, 42, 2, 234);
